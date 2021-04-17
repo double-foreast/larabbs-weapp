@@ -41,7 +41,7 @@ export default class extends wepy.app {
       selectedColor: '#00b5ad'
     }
   }
-}
+
 
   constructor () {
     super()
@@ -51,4 +51,5 @@ export default class extends wepy.app {
   onLaunch() {
 
   }
+}
 </script>
