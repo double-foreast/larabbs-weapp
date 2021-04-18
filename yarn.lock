@@ -2014,7 +2014,7 @@ util-deprecate@^1.0.1, util-deprecate@~1.0.1:
   resolved "https://registry.npm.taobao.org/util-deprecate/download/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
-wepy-async-function@^1.4.4:
+wepy-async-function@^1.4.7:
   version "1.4.7"
   resolved "https://registry.npm.taobao.org/wepy-async-function/download/wepy-async-function-1.4.7.tgz#f783164306e175d9a7c2656a33532e619c8eae16"
   integrity sha1-94MWQwbhddmnwmVqM1MuYZyOrhY=
