@@ -10,7 +10,7 @@
 <template>
   <view class="page">
     <view class="page__bd register-wrap">
-      <form bindSubmit="submit">
+      <form bindsubmit="submit">
         <view class="weui-toptips weui-toptips_warn" wx:if="{{ errorMessage }}">{{ errorMessage }}</view>
         <view class="weui-cells__title">Larabbs 手机注册</view>
 
@@ -147,6 +147,77 @@ export default class Register extends wepy.page {
         }
         this.captchaModalHidden = false
         this.$apply()
+      }
+    } catch (err) {
+      console.log(err)
+      wepy.showModal({
+        title: '提示',
+        content: '服务器错误，请联系管理员'
+      })
+    }
+  }
+
+  async submit(e) {
+    this.errors = {}
+    if (!this.verificationCode.key) {
+      wepy.showToast({
+        title: '请发送验证码',
+        icon: 'none',
+        duration: 2000
+      })
+      return false
+    }
+    if (new Date().getTime() > this.verificationCode.expiredAt) {
+      wepy.showToast({
+        title: '验证码已过期',
+        icon: 'none',
+        duration: 2000
+      })
+      this.resetRegister()
+      return false
+    }
+
+    try {
+      let formData = e.detail.value
+      formData.verification_key = this.verificationCode.key
+
+      let loginData = await wepy.login()
+
+      formData.code = loginData.code
+
+      let registerResponse = await api.request({
+        url: 'weapp/users',
+        method: 'POST',
+        data: formData
+      })
+
+      // 验证码失效
+      if (registerResponse.statusCode === 422) {
+        this.errors = registerResponse.data.errors
+        this.$apply()
+      // 验证码错误/code不正确
+      } else if (registerResponse.statusCode === 401) {
+        this.errors.verification_code = ['验证码错误']
+        this.$apply()
+      // 已绑定其他用户
+      } else if (registerResponse.statusCode === 403) {
+
+      } else if (registerResponse.statusCode === 201) {
+        wepy.setStorageSync('access_token', registerResponse.data.meta.access_token)
+        wepy.setStorageSync('access_token_expired_at', new Date().getTime() + registerResponse.data.meta.expires_at)
+
+        wepy.setStorageSync('user', registerResponse.data)
+
+        wepy.showToast({
+          title: '注册成功',
+          icon: 'success'
+        })
+
+        setTimeout(() => {
+          wepy.switchTab({
+            url: '/pages/user'
+          })
+        }, 2000)
       }
     } catch (err) {
       console.log(err)
