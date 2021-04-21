@@ -22,7 +22,7 @@
     <view class="page__bd">
       <view class="weui-cells weui-cells_after-title">
 
-        <navigator url="" class="weui-cell" wx:if="{{ user }}">
+        <navigator url="/pages/users/edit" class="weui-cell" wx:if="{{ user }}">
           <view class="weui-cell__hd avatar-wrap">
               <image src="{{ user.avatar }}" class="avatar"/>
           </view>
@@ -74,7 +74,7 @@
 	import wepy from 'wepy'
 import api from '@/utils/api'
 
-	export default class User extends wepy.page {
+	export default class UserMe extends wepy.page {
   config = {
     navigationBarTitleText: '我的'
   }

@@ -215,7 +215,7 @@ export default class Register extends wepy.page {
 
         setTimeout(() => {
           wepy.switchTab({
-            url: '/pages/user'
+            url: '/pages/users/me'
           })
         }, 2000)
       }
