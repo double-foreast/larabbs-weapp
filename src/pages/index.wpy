@@ -8,7 +8,7 @@
         <repeat for="{{ topics }}" key="id" index="index" item="topic">
           <navigator url="" class="weui-media-box weui-media-box-appmsg" hover-class="weui-cell-active">
             <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-              <image class="weui-media-box__thumb" src="https://cdn.learnku.com/uploads/images/201801/03/1/AsLlHzUmyq.jpg">
+              <image class="weui-media-box__thumb" src="https://cdn.learnku.com/uploads/images/201801/03/1/AsLlHzUmyq.jpg"/>
             </view>
             <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
               <view class="weui-media-box__title">{{ topic.title }}</view>
