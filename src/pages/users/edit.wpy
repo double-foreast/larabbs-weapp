@@ -141,6 +141,7 @@ export default class UserEdit extends wepy.page {
           // 小程序上传结果没有做 JSON.parse，需要手动处理
           let responseData = JSON.parse(imageResponse.data)
           this.user.avatar = responseData.path
+          // 检查图片路径是否需要加域名
           this.avatarId = responseData.id
           this.$apply()
         }
