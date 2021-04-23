@@ -1,26 +1,4 @@
 <style lang="less">
-.weui-media-box__info__meta {
-  margin: 0;
-  font-size: 12px;
-}
-.topic-info {
-  margin-top: 5px;
-}
-.topic-title {
-  white-space: normal;
-  font-size: 14px;
-}
-.avatar {
-  padding: 4px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 50px;
-  height: 50px;
-}
-.reply-count {
-  background-color: #d8d8d8;
-  float: right;
-}
 .weui-flex {
   align-items: center;
 }
@@ -92,36 +70,14 @@
     </view>
   </view>
   <view class="page__bd">
-    <view class="weui-panel weui-panel_access">
-      <view class="weui-panel__bd">
-        <repeat for="{{ topics }}" key="id" index="index" item="topic">
-          <navigator url="/pages/topics/show?id={{ topic.id }}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell-active">
-            <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
-              <image class="weui-media-box__thumb avatar" src="{{ topic.user.avatar }}"/>
-            </view>
-            <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-              <view class="weui-media-box__title topic-title">{{ topic.title }}</view>
-              <view class="weui-media-box__info topic-info">
-                <view class="weui-media-box__info__meta">{{ topic.category.name }} • </view>
-                <view class="weui-media-box__info__meta">{{ topic.user.name }} • </view>
-                <view class="weui-media-box__info__meta">{{ topic.updated_at_diff }}</view>
-              </view>
-            </view>
-            <view class="weui-badge reply-count">{{ topic.reply_count }}</view>
-          </navigator>
-        </repeat>
-        <view class="weui-loadmore weui-loadmore_line" wx:if="{{ noMoreData }}">
-          <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多数据</view>
-        </view>
-      </view>
-    </view>
+    <topiclist :syncData.sync="requestData"></topiclist>
   </view>
 </view>
 </template>
 <script>
 import wepy from 'wepy'
 import api from '@/utils/api'
-import util from '@/utils/util'
+import topicList from '@/components/topicList'
 
 export default class TopicIndex extends wepy.page {
   config = {
@@ -133,7 +89,11 @@ export default class TopicIndex extends wepy.page {
     topics: [],
     noMoreData: false,
     categoryOpen: false,
-    currentCategory: {}
+    currentCategory: {},
+    requestData: {}
+  }
+  components = {
+    topiclist: topicList
   }
   computed = {
     currentCategoryId: () => {
@@ -166,60 +126,18 @@ export default class TopicIndex extends wepy.page {
     }
   }
 
-  async getTopics(page = 1, reset = false) {
-    try {
-      let topicsResponse = await api.request({
-        url: 'topics',
-        method: 'GET',
-        data: {
-          page: page,
-          include: 'user,category',
-          category_id: this.currentCategoryId
-        }
-      })
-      if (topicsResponse.statusCode === 200) {
-        let topics = topicsResponse.data.data
-
-        topics.forEach(topic => {
-          topic.updated_at_diff = util.diffForHumans(topic.updated_at)
-        })
-
-        this.topics = reset ? topics : this.topics.concat(topics)
-
-        let pagination = topicsResponse.data.meta.pagination
-        if (pagination.current_page === pagination.total_pages) {
-          this.noMoreData = true
-        }
-        this.$apply()
-      }
-    } catch (error) {
-      console.log(error)
-      wepy.showModal({
-        title: '提示',
-        content: '话题获取失败'
-      })
-    }
+  onLoad() {
+    this.getCategories()
+    this.$invoke('topiclist', 'reload')
   }
 
   async onPullDownRefresh() {
-    this.page = 1
-    this.noMoreData = false
-    await this.getTopics(1, true)
+    await this.$invoke('topiclist', 'reload')
     wepy.stopPullDownRefresh()
   }
 
   async onReachBottom() {
-    if (this.noMoreData) {
-      return
-    }
-    this.page = this.page + 1
-    await this.getTopics(this.page)
-    this.$apply()
-  }
-
-  async onLoad() {
-    this.getTopics()
-    this.getCategories()
+    this.$invoke('topiclist', 'loadMore')
   }
 
   methods = {
@@ -230,7 +148,8 @@ export default class TopicIndex extends wepy.page {
       this.currentCategory = id ? this.categories.find(category => category.id === id) : {}
       this.categoryOpen = false
       this.$apply()
-      await this.getTopics(1, true)
+      this.requestData.category_id = this.currentCategoryId
+      this.$invoke('topiclist', 'reload')
     }
   }
 }
