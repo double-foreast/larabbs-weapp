@@ -131,6 +131,12 @@ export default class TopicIndex extends wepy.page {
     this.$invoke('topiclist', 'reload')
   }
 
+  onShow() {
+    this.$parent.checkRefreshPages(this.getCurrentPages().pop().route, () => {
+      this.$invoke('topiclist', 'reload')
+    })
+  }
+
   async onPullDownRefresh() {
     await this.$invoke('topiclist', 'reload')
     wepy.stopPullDownRefresh()
