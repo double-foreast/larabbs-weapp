@@ -6,7 +6,9 @@ export default class unreadCount extends wepy.mixin {
     unreadCount: 0
   }
   onShow() {
-    this.updateUnreadCount()
+    setTimeout(() => {
+      this.updateUnreadCount()
+    }, 1000);
     this.intetval = setInterval(() => {
       this.updateUnreadCount()
     }, 30000);
