@@ -23,7 +23,9 @@ export default class ReplyMixin extends wepy.mixin {
       })
       if (repliesResponse.statusCode === 200) {
         let replies = repliesResponse.data.data
+        let user = await this.$parent.getCurrentUser()
         replies.forEach(reply => {
+          reply.can_delete = this.canDelete(user, reply)
           reply.create_at_diff = util.diffForHumans(reply.create_at)
         })
         this.replies = reset ? replies : this.replies.concat(replies)
@@ -42,6 +44,13 @@ export default class ReplyMixin extends wepy.mixin {
     }
   }
 
+  canDelete(user, reply) {
+    if (!user) {
+      return
+    }
+    return (user.id === reply.user_id)
+  }
+
   async onPullDownRefresh() {
     this.page = 1
     this.noMoreData = false
@@ -58,5 +67,36 @@ export default class ReplyMixin extends wepy.mixin {
     await this.getReplies()
     this.isLoading = false
     this.$apply()
+  }
+
+  methods = {
+    async deleteReply(topicId, replyId) {
+      let res = await wepy.showModal({
+        title: '确认删除',
+        content: '你确认删除该回复吗',
+        confirmText: '删除',
+        cancelText: '取消'
+      })
+      if (!res.confirm) {
+        return
+      }
+      try {
+        let deleteResponse = await api.authRequest({
+          url: 'topics/' + topicId + '/replies/' + replyId,
+          method: 'DELETE'
+        })
+        if (deleteResponse.statusCode === 204) {
+          wepy.showToast({
+            title: '删除成功',
+            icon: 'success',
+            duration: 2000
+          })
+          this.replies = this.replies.filter((reply) => reply.id !== replyId)
+          this.$apply()
+        }
+      } catch (error) {
+
+      }
+    }
   }
 }
