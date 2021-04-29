@@ -105,7 +105,8 @@ export default class extends wepy.app {
   }
 
   globalData = {
-    refreshPages: []
+    refreshPages: [],
+    unreadCount: 0
   }
 
   checkRefreshPages(route, callback) {
@@ -118,9 +119,20 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
-    wepy.login().then(res => {
-      console.log('login: ', res)
-    })
+    this.updateUnreadCount()
+    setInterval(() => {
+      this.updateUnreadCount()
+    }, 60000)
+  }
+
+  async updateUnreadCount() {
+    if (!this.checkLogin()) {
+      return
+    }
+    let notificationResponse = await api.authRequest('user/notifications/stat', false)
+    if (notificationResponse.statusCode === 200) {
+      this.globalData.unreadCount = notificationResponse.data.unread_count
+    }
   }
 }
 </script>
