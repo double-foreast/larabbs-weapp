@@ -106,6 +106,18 @@ export default class TopicShow extends wepy.page {
       return (this.user.id === this.topic.user_id) || this.$parent.can('manage_contents')
     }
   }
+  onShareAppMessage(res) {
+    return {
+      title: this.topic.title,
+      path: '/pages/topics/show?id=' + this.topic.id,
+      success: function(res) {
+        console.log(res)
+      },
+      fail: function(res) {
+        console.log(res)
+      }
+    }
+  }
   methods = {
     async deleteTopic() {
       let res = await wepy.showModal({
