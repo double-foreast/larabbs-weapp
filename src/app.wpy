@@ -124,6 +124,7 @@ export default class extends wepy.app {
     setInterval(() => {
       this.updateUnreadCount()
     }, 60000)
+    this.getPerms()
   }
 
   async updateUnreadCount() {
@@ -134,6 +135,35 @@ export default class extends wepy.app {
     if (notificationResponse.statusCode === 200) {
       this.globalData.unreadCount = notificationResponse.data.unread_count
     }
+  }
+  async getPerms() {
+    let perms = []
+    if (!this.checkLogin()) {
+      return perms
+    }
+    try {
+      let permsResponse = await api.authRequest('user/permissions', false)
+      if (permsResponse.statusCode === 200) {
+        perms = permsResponse.data.data
+        wepy.setStorageSync('perms', perms)
+      }
+    } catch (error) {
+      wepy.showModal({
+        title: '提示',
+        content: '权限获取失败'
+      })
+    }
+    return perms
+  }
+  can(targetPerm) {
+    if (!this.checkLogin()) {
+      return false
+    }
+    let perms = wepy.getStorageSync('perms') || []
+    if (perms.find(perm => perm.name === targetPerm)) {
+      return true
+    }
+    return false
   }
 }
 </script>

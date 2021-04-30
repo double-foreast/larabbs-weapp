@@ -207,7 +207,7 @@ export default class Register extends wepy.page {
         wepy.setStorageSync('access_token_expired_at', new Date().getTime() + registerResponse.data.meta.expires_at)
 
         wepy.setStorageSync('user', registerResponse.data)
-
+        this.$parent.getPerms()
         wepy.showToast({
           title: '注册成功',
           icon: 'success'

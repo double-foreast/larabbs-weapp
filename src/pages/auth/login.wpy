@@ -102,6 +102,7 @@
 
           // 201 登录正确
           if (authResponse.statusCode === 201) {
+            this.$parent.getPerms()
             wepy.navigateBack()
           }
         } catch (err) {
@@ -119,6 +120,7 @@
         let authResponse = await api.login()
 
         if (authResponse.statusCode === 201) {
+          this.$parent.getPerms()
           wepy.navigateBack()
         } else if (authResponse.statusCode === 403) {
           // 待绑定

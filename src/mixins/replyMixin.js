@@ -48,7 +48,7 @@ export default class ReplyMixin extends wepy.mixin {
     if (!user) {
       return
     }
-    return (user.id === reply.user_id)
+    return (user.id === reply.user_id) || this.$parent.can('manage_contents')
   }
 
   async onPullDownRefresh() {
